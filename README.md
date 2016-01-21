@@ -22,7 +22,7 @@ optional arguments:
   --systemd    use systemd
 ```
 
-## help
+## Help
 
 Needed for MacOS and Windows versions
 
