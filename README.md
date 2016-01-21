@@ -1,11 +1,12 @@
 # docker-composition-installer
-Generic script to install a docker composition as a daemon with complete boot init scripts.
 
-Compatible only with Linux for now (sysvinit or systemd).
+Generic script to install a docker composition as a daemon with complete boot/init scripts.
+
+Compatible only with Linux for now (sysvinit or systemd init systems).
 
 ## Usage
 
-Just copy `install.py` somewhere in your docker-compose project.
+Just copy `install.py` somewhere in your docker-compose project and run it as root or with `sudo`.
 
 ```
 usage: install.py [-h] [--uninstall] [--systemd] [config_file]
@@ -21,9 +22,12 @@ optional arguments:
   --systemd    use systemd
 ```
 
+## help
+
+Needed for MacOS and Windows versions
+
 ## Licence
 
 The MIT License (MIT)
 
 Copyright (c) 2016 Guillaume Pellerin @yomguy
-
