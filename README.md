@@ -1,7 +1,7 @@
 # docker-composition-installer
-Generic script to install a docker composition as a daemon
+Generic script to install a docker composition as a daemon with complete boot init scripts.
 
-Just copy `install.py` somewhere in your docker-compose project if you need it as a daemon with boot init scripts.
+Just copy `install.py` somewhere in your docker-compose project.
 
 Compatible only with Linux for now (sysvinit or systemd).
 
