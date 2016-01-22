@@ -100,7 +100,7 @@ WantedBy=local.target
 """
 
 
-class DockerComposeDaemonInstall(object):
+class DockerCompositionInstaller(object):
 
     docker = '/etc/init.d/docker'
     docker_compose = '/usr/local/bin/docker-compose'
@@ -149,7 +149,7 @@ class DockerComposeDaemonInstall(object):
         os.system('systemctl enable ' + service)
         os.system('systemctl daemon-reload')
 
-    def run(self):
+    def install(self):
         print 'Installing ' + self.name + ' composition as a daemon...'
         self.install_docker()
         if self.init_type == 'sysvinit':
@@ -169,7 +169,7 @@ class DockerComposeDaemonInstall(object):
         os.system('systemctl daemon-reload')
         os.system('rm ' + service)
 
-    def un(self):
+    def uninstall(self):
         print 'Uninstalling ' + self.name + ' composition as a daemon...'
         if self.init_type == 'sysvinit':
             self.uninstall_daemon_sysvinit()
@@ -194,12 +194,11 @@ def main():
     if args['composition_file']:
         config = args['composition_file']
 
-    print init_type, config
-    install = DockerComposeDaemonInstall(config, init_type)
+    installer = DockerCompositionInstaller(config, init_type)
     if args['uninstall']:
-        install.un()
+        installer.uninstall()
     else:
-        install.run()
+        installer.install()
 
 if __name__ == '__main__':
     if not 'Linux' in platform.system():
