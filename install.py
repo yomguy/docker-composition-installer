@@ -179,7 +179,7 @@ class DockerComposeDaemonInstall(object):
 
 
 def main():
-    description ="""Install a docker composition as a daemon with boot init (sysvinit by default)."""
+    description ="""Install this docker composition program as a daemon with boot init (sysvinit by default)."""
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--uninstall', help='uninstall the daemon', action='store_true')
     parser.add_argument('--systemd', help='use systemd', action='store_true')
