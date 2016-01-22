@@ -19,7 +19,7 @@ Install this docker composition program as a daemon with boot init (sysvinit
 by default).
 
 positional arguments:
-  composition_file  the path of the YAML composition file to use
+  composition_file  the path of the YAML composition file to use (optional)
 
 optional arguments:
   -h, --help        show this help message and exit

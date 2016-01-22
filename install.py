@@ -183,7 +183,7 @@ def main():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--uninstall', help='uninstall the daemon', action='store_true')
     parser.add_argument('--systemd', help='use systemd', action='store_true')
-    parser.add_argument('composition_file', nargs='?', help='the path of the YAML composition file to use')
+    parser.add_argument('composition_file', nargs='?', help='the path of the YAML composition file to use (optional)')
 
     config = 'docker-compose.yml'
     init_type = 'sysvinit'
