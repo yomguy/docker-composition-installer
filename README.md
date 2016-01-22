@@ -13,18 +13,18 @@ Just copy `install.py` somewhere in your docker-compose project and run it as ro
 It will install Docker and docker-compose automatically only if they are not installed yet.
 
 ```
-usage: install.py [-h] [--uninstall] [--systemd] [config_file]
+usage: install.py [-h] [--uninstall] [--systemd] [composition_file]
 
 Install this docker composition program as a daemon with boot init (sysvinit
 by default).
 
 positional arguments:
-  config_file  the path of the YAML composition to install
+  composition_file  the path of the YAML composition file to use
 
 optional arguments:
-  -h, --help   show this help message and exit
-  --uninstall  uninstall the daemon
-  --systemd    use systemd
+  -h, --help        show this help message and exit
+  --uninstall       uninstall the daemon
+  --systemd         use systemd
 ```
 
 ## Help
