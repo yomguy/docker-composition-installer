@@ -26,7 +26,7 @@ optional arguments:
 
 Needed for MacOS and Windows versions
 
-## Licence
+## License
 
 The MIT License (MIT)
 
