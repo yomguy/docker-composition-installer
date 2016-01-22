@@ -116,8 +116,8 @@ class DockerComposeDaemonInstall(object):
         path = self.path
         while not self.config in os.listdir(path):
             path = os.sep.join(path.split(os.sep)[:-1])
-        if not path:
-            raise ValueError('The YAML docker composition was not found, please type "install.py -h" for more infos.')
+            if not path:
+                raise ValueError('The YAML docker composition was not found, please type "install.py -h" for more infos.')
         return path
 
     def install_docker(self):

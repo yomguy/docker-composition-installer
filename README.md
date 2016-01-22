@@ -4,7 +4,7 @@ Generic script to install a docker composition program as a daemon with complete
 
 Compatible only with Linux for now (sysvinit or systemd init systems).
 
-Dependencies: python, wget (for docker)
+Dependencies: `python`,  `wget` (for docker), `pip` (for docker-compose)
 
 ## Usage
 
@@ -15,7 +15,8 @@ It will install Docker and docker-compose automatically only if they are not ins
 ```
 usage: install.py [-h] [--uninstall] [--systemd] [config_file]
 
-Install a docker composition as a daemon with boot init (SysVinit by default).
+Install this docker composition program as a daemon with boot init (sysvinit
+by default).
 
 positional arguments:
   config_file  the path of the YAML composition to install
