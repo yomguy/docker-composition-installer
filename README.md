@@ -8,7 +8,7 @@ Dependencies: `python`,  `wget` (for docker), `pip` (for docker-compose)
 
 ## Usage
 
-Just copy `install.py` somewhere in your docker-compose project and run it as root or with `sudo`.
+Just copy/drop `install.py` somewhere in your docker-compose project and run it as root or with `sudo`.
 
 It will install Docker and docker-compose automatically only if they are not installed yet.
 
