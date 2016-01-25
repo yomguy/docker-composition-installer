@@ -31,6 +31,10 @@ optional arguments:
 
 Needed for MacOS and Windows versions
 
+## Acknowledgments
+
+Thanks to Rémi Desmonet for helping on sysvinit ;)
+
 ## License
 
 The MIT License (MIT)
