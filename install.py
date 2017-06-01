@@ -200,8 +200,9 @@ def main():
 
     config = ['docker-compose.yml']
     init_type = 'sysvinit'
+    dry_run = False
     args = vars(parser.parse_args())
- 
+
     if args['systemd']:
         init_type = 'systemd'
     if args['composition_file']:
