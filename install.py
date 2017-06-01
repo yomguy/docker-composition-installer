@@ -28,7 +28,7 @@ sysvinit_script = """#!/bin/sh
 set -e
 
 PROJECT_NAME={project_name}
-OPTS={compose_opts}
+OPTS="{compose_opts}"
 UPOPTS="-d --no-recreate --no-build --no-deps"
 
 . /lib/lsb/init-functions
