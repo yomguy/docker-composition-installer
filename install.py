@@ -195,7 +195,7 @@ def main():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--uninstall', help='uninstall the daemon', action='store_true')
     parser.add_argument('--systemd', help='use systemd', action='store_true')
-    parser.add_argument('--dry-run', help='dry run, do not install the daemon but print the docker-compose command line', action='store_true')
+    parser.add_argument('--dry-run', help='dry run, do not install the daemon but print the service file', action='store_true')
     parser.add_argument('composition_file', nargs='*', help='the path of the YAML composition file to use (optional)')
 
     config = ['docker-compose.yml']
