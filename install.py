@@ -15,7 +15,6 @@ import argparse
 import platform
 from pwd import getpwnam
 from grp import getgrnam
-from shutil import copyfile
 
 sysvinit_script = """#!/bin/sh
 ### BEGIN INIT INFO
@@ -30,7 +29,7 @@ sysvinit_script = """#!/bin/sh
 set -e
 
 PROJECT_NAME=%s
-YAMLFILE=%s
+YAMLFILE="%s"
 OPTS="-f $YAMLFILE -p $PROJECT_NAME"
 UPOPTS="-d --no-build --no-deps"
 
@@ -107,14 +106,21 @@ class DockerCompositionInstaller(object):
     docker_compose = '/usr/local/bin/docker-compose'
     cron_rule = "0 */6 * * * %s %s"
 
-    def __init__(self, config='docker-compose.yml', init_type='sysvinit', cron=False):
+    def __init__(self, config='docker-compose.yml', init_type='sysvinit', cron=False, user=None):
         self.init_type = init_type
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.config = config
         self.root = self.get_root()
-        self.config = os.path.abspath(self.root + os.sep + self.config)
+        self.config = os.path.abspath(self.get_root() + os.sep + self.config)
+        self.config_prod = self.root + os.sep + 'env/prod.yml'
         self.name = self.config.split(os.sep)[-2].lower()
+        if os.path.exists(self.config_prod):
+            self.config += ' -f ' + self.config_prod
         self.cron = cron
+        if user:
+            self.user = user
+        else:
+            self.user = "root"
 
     def get_root(self):
         path = self.path
@@ -154,15 +160,18 @@ class DockerCompositionInstaller(object):
         os.system('systemctl daemon-reload')
 
     def install_cron(self):
-        cron_path = os.sep.join([self.root, 'etc', 'cron.d', 'app'])
-        log_path = os.sep.join([self.root, 'var', 'log', 'cron'])
+        # version with migration
+        # without migration
+        log_path = "/var/log/"+ self.name
         if not os.path.exists(log_path) :
             os.makedirs(log_path, 0o755)
-        copyfile(cron_path, '/etc/cron.d/' + self.name)
-        uid  = int(getpwnam('root').pw_uid)
-        guid = int(getgrnam('root').gr_gid)
-        fd_cron_path = os.open(cron_path, os.O_RDONLY)
-        os.fchown(fd_cron_path, 0, 0)
+            os.chown(log_path, getpwnam(self.user).pw_uid, getgrnam(self.user).gr_gid)
+        path = "PATH=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin\n"
+        command = "cd %s && ./scripts/push.sh >> /var/log/%s-push.log 2>&1 \n" % (self.root, self.name)
+        rule = self.cron_rule % (self.user, command)
+        f = open('/etc/cron.d/' + self.name, 'w')
+        f.write(path + rule)
+        f.close()
 
     def uninstall_daemon_sysvinit(self):
         script = '/etc/init.d/' + self.name
@@ -205,6 +214,7 @@ def main():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--uninstall', help='uninstall the daemon', action='store_true')
     parser.add_argument('--cron', help='install cron backup rule', action='store_true')
+    parser.add_argument('--user', help='specify user', type=str)
     parser.add_argument('--systemd', help='use systemd', action='store_true')
     parser.add_argument('composition_file', nargs='?', help='the path of the YAML composition file to use (optional)')
 
@@ -217,7 +227,7 @@ def main():
     if args['composition_file']:
         config = args['composition_file']
 
-    installer = DockerCompositionInstaller(config, init_type, args['cron'])
+    installer = DockerCompositionInstaller(config, init_type, args['cron'], args['user'])
     if args['uninstall']:
         installer.uninstall()
     else:
