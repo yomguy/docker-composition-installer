@@ -15,6 +15,7 @@ import argparse
 import platform
 from pwd import getpwnam
 from grp import getgrnam
+from shutil import copyfile
 
 sysvinit_script = """#!/bin/sh
 ### BEGIN INIT INFO
@@ -104,7 +105,6 @@ class DockerCompositionInstaller(object):
 
     docker = '/etc/init.d/docker'
     docker_compose = '/usr/local/bin/docker-compose'
-    cron_rule = "0 */6 * * * %s %s"
 
     def __init__(self, config='docker-compose.yml', init_type='sysvinit', cron=False, user=None):
         self.init_type = init_type
@@ -117,6 +117,8 @@ class DockerCompositionInstaller(object):
         if os.path.exists(self.config_prod):
             self.config += ' -f ' + self.config_prod
         self.cron = cron
+        if cron:
+            self.cron_path = self.root + os.sep + 'etc/cron.d/app'
         if user:
             self.user = user
         else:
@@ -160,17 +162,16 @@ class DockerCompositionInstaller(object):
         os.system('systemctl daemon-reload')
 
     def install_cron(self):
-        # version with migration
-        # without migration
-        log_path = "/var/log/"+ self.name
+        # the cron script should be in etc/cron.d/ relative to the app directory
+        log_path = "var/log/cron"
         if not os.path.exists(log_path) :
             os.makedirs(log_path, 0o755)
             os.chown(log_path, getpwnam(self.user).pw_uid, getgrnam(self.user).gr_gid)
-        path = "PATH=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/bin\n"
-        command = "cd %s && ./bin/push.sh >> /var/log/%s-push.log 2>&1 \n" % (self.root, self.name)
-        rule = self.cron_rule % (self.user, command)
+        f = open(self.cron_path)
+        rule = f.read()
+        f.close()
         f = open('/etc/cron.d/' + self.name, 'w')
-        f.write(path + rule)
+        f.write(rule % self.root)
         f.close()
 
     def uninstall_daemon_sysvinit(self):
