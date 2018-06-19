@@ -29,9 +29,21 @@ sysvinit_script = """#!/bin/sh
 
 set -e
 
+[ -f /etc/default/$(basename $0) ] && . /etc/default/$(basename $0)
+
+[ -z "$env" ] && env=prod
+
 PROJECT_NAME=%s
-YAMLFILE="%s"
-OPTS="-f $YAMLFILE -p $PROJECT_NAME"
+BASE_YAML_FILE=%s
+OPTIONAL_YAML_FILE=/srv/$PROJECT_NAME/env/${env}.yml
+
+if [ -f $OPTIONAL_YAML_FILE ]; then
+    YAMLFILES="$BASE_YAML_FILE -f $OPTIONAL_YAML_FILE"
+else
+    YAMLFILES="$BASE_YAML_FILE"
+fi
+
+OPTS="-f $YAMLFILES -p $PROJECT_NAME"
 UPOPTS="-d --no-build --no-deps"
 
 . /lib/lsb/init-functions
@@ -112,10 +124,6 @@ class DockerCompositionInstaller(object):
         self.config = config
         self.root = self.get_root()
         self.config = os.path.abspath(self.get_root() + os.sep + self.config)
-        self.config_prod = self.root + os.sep + 'env/prod.yml'
-        self.name = self.config.split(os.sep)[-2].lower()
-        if os.path.exists(self.config_prod):
-            self.config += ' -f ' + self.config_prod
         self.cron = cron
         if cron:
             self.cron_path = self.root + os.sep + 'etc/cron.d/app'
