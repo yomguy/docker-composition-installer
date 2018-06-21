@@ -124,6 +124,7 @@ class DockerCompositionInstaller(object):
         self.config = config
         self.root = self.get_root()
         self.config = os.path.abspath(self.get_root() + os.sep + self.config)
+        self.name = self.config.split(os.sep)[-2].lower()
         self.cron = cron
         if cron:
             self.cron_path = self.root + os.sep + 'etc/cron.d/app'
