@@ -180,7 +180,7 @@ class DockerCompositionInstaller(object):
         rule = f.read()
         f.close()
         f = open('/etc/cron.d/' + self.name, 'w')
-        f.write(rule)
+        f.write(rule % self.root)
         f.close()
 
     def uninstall_daemon_sysvinit(self):
