@@ -118,7 +118,7 @@ class DockerCompositionInstaller(object):
     docker = '/etc/init.d/docker'
     docker_compose = '/usr/local/bin/docker-compose'
 
-    def __init__(self, config='docker-compose.yml', init_type='sysvinit', cron=False, user=None):
+    def __init__(self, config='docker-compose.yml', init_type='sysvinit', cron=False, user='root', logrotate=False):
         self.init_type = init_type
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.config = config
@@ -126,12 +126,11 @@ class DockerCompositionInstaller(object):
         self.config = os.path.abspath(self.get_root() + os.sep + self.config)
         self.name = self.config.split(os.sep)[-2].lower()
         self.cron = cron
-        if cron:
-            self.cron_path = self.root + os.sep + 'etc/cron.d/app'
-        if user:
-            self.user = user
-        else:
-            self.user = "root"
+        self.cron_path = self.root + os.sep + 'etc/cron.d/app'
+        self.user = user
+        self.logrotate = logrotate
+        self.logrotate_path = self.root + os.sep + 'etc/logrotate.d/app'
+
 
     def get_root(self):
         path = self.path
@@ -197,6 +196,22 @@ class DockerCompositionInstaller(object):
     def uninstall_cron(self):
         os.system('rm /etc/cron.d/' + self.name)
 
+    def install_logrotate(self):
+        # the cron script should be in etc/cron.d/ relative to the app directory
+        log_path = "var/log/app"
+        if not os.path.exists(log_path) :
+            os.makedirs(log_path, 0o755)
+            os.chown(log_path, getpwnam(self.user).pw_uid, getgrnam(self.user).gr_gid)
+        f = open(self.logrotate_path)
+        rule = f.read()
+        f.close()
+        f = open('/etc/logrotate.d/' + self.name, 'w')
+        f.write(rule % self.root)
+        f.close()
+
+    def uninstall_logrotate(self):
+        os.system('rm /etc/logrotate.d/' + self.name)
+
     def uninstall(self):
         print 'Uninstalling ' + self.name + ' composition as a daemon...'
         if self.init_type == 'sysvinit':
@@ -205,6 +220,8 @@ class DockerCompositionInstaller(object):
             self.uninstall_daemon_systemd()
         if self.cron:
             self.uninstall_cron()
+        if self.logrotate:
+            self.uninstall_logrotate()
         print 'Done'
 
     def install(self):
@@ -216,6 +233,8 @@ class DockerCompositionInstaller(object):
             self.install_daemon_systemd()
         if self.cron:
             self.install_cron()
+        if self.logrotate:
+            self.install_logrotate()
         print 'Done'
 
 
@@ -226,6 +245,7 @@ def main():
     parser.add_argument('--cron', help='install cron backup rule', action='store_true')
     parser.add_argument('--user', help='specify user', type=str)
     parser.add_argument('--systemd', help='use systemd', action='store_true')
+    parser.add_argument('--logrotate', help='install logrotate rule', action='store_true')
     parser.add_argument('composition_file', nargs='?', help='the path of the YAML composition file to use (optional)')
 
     config = 'docker-compose.yml'
@@ -237,7 +257,7 @@ def main():
     if args['composition_file']:
         config = args['composition_file']
 
-    installer = DockerCompositionInstaller(config, init_type, args['cron'], args['user'])
+    installer = DockerCompositionInstaller(config, init_type, args['cron'], args['user'], args['logrotate'])
     if args['uninstall']:
         installer.uninstall()
     else:
